@@ -63,6 +63,8 @@ dependencies {
     //Retrofit
     implementation (libs.logging.interceptor)
     implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
 
     // Coil Imagenes en Compos
     implementation(libs.coil.compose)
