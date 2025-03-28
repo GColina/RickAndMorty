@@ -1,5 +1,6 @@
 package com.gcolina.rickandmorty.di
 
+import com.gcolina.rickandmorty.core.navigation.NavManager
 import com.gcolina.rickandmorty.data.CharactersApi
 import com.gcolina.rickandmorty.data.repository.CharacterDataSource
 import com.gcolina.rickandmorty.data.repository.CharacterRepository
@@ -44,6 +45,12 @@ object NetworkModule {
     @Singleton
     fun providesHeroesRepository(characterDataSource: CharacterDataSource): CharacterRepository {
         return CharacterRepositoryImpl(characterDataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNavManager(): NavManager {
+        return NavManager()
     }
 
 }
