@@ -11,7 +11,12 @@ import androidx.compose.ui.res.colorResource
 import com.gcolina.rickandmorty.R
 
 @Composable
-fun Loader(isLoading: Boolean, content: @Composable () -> Unit) {
+fun Loader(
+    isLoading: Boolean,
+    isApiError: Boolean,
+    navigateToError: () -> Unit,
+    content: @Composable () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -22,6 +27,8 @@ fun Loader(isLoading: Boolean, content: @Composable () -> Unit) {
             CircularProgressIndicator(
                 color = colorResource(R.color.tertiary_color)
             )
+        } else if (isApiError) {
+            navigateToError()
         } else content()
     }
 }

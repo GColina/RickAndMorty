@@ -4,6 +4,8 @@
     <dimen name="mid_padding">16dp</dimen>
     <dimen name="big_padding">32dp</dimen>
 
+    <dimen name="height_div_filter">1dp</dimen>
+
 
     <dimen name="load_screen_circular_progress_size">50dp</dimen>
 </resources>

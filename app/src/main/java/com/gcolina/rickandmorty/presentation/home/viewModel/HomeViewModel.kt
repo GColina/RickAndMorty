@@ -16,8 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val characterRepository: CharacterRepository,
-    private val navManager: NavManager
+    private val characterRepository: CharacterRepository, private val navManager: NavManager
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow(HomeUiState())
@@ -30,9 +29,8 @@ class HomeViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         info = list.info.toDomain(),
                         characters = list.results.map { result -> result.toDomain() })
-
                 }.onFailure {
-                    Log.e("LogGeneral", "fetchData: ${it.message}")
+                    _uiState.value = _uiState.value.copy(error = it.message)
                 }
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }
@@ -43,11 +41,54 @@ class HomeViewModel @Inject constructor(
         navManager.updateCharacterId(characterId)
     }
 
+    fun onLoadMore() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoadingMore = true)
+            characterRepository.getNextPage(uiState.value.info?.next ?: "").collect { result ->
+                result.onSuccess { list ->
+                    _uiState.value = _uiState.value.copy(
+                        info = list.info.toDomain(),
+                        characters = _uiState.value.characters + list.results.map { result -> result.toDomain() })
+                }.onFailure {
+                    _uiState.value = _uiState.value.copy(error = it.message)
+                }
+                _uiState.value = _uiState.value.copy(isLoadingMore = false)
+            }
+        }
+    }
+
+    fun onSearchByName() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoadingSearch = true)
+            Log.e("LogGeneral", "onSearchByName: ${uiState.value.etSearchByName}")
+            characterRepository.getCharacterByName(uiState.value.etSearchByName.toString())
+                .collect { result ->
+                    result.onSuccess { list ->
+                        _uiState.value = _uiState.value.copy(
+                            info = list.info.toDomain(),
+                            charactersFiltered = list.results.map { result -> result.toDomain() })
+                        Log.d("LogGeneral", "onSearchByName: ${_uiState.value.charactersFiltered}")
+                    }.onFailure {
+                        Log.e("LogGeneral", "onSearchByName: ${it.message}")
+                    }
+                    _uiState.value = _uiState.value.copy(isLoadingSearch = false)
+                }
+        }
+    }
+
+    fun onTextChange(string: String) {
+        _uiState.value = _uiState.value.copy(etSearchByName = string)
+    }
+
 }
 
 data class HomeUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val characters: List<Character> = emptyList(),
-    val info: Info? = null
+    val charactersFiltered: List<Character> = emptyList(),
+    val info: Info? = null,
+    val isLoadingMore: Boolean = false,
+    val etSearchByName: String? = null,
+    val isLoadingSearch: Boolean = false,
 )

@@ -32,6 +32,7 @@ class DetailViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(character = character.toDomain())
                     }.onFailure {
                         Log.e("LogGeneral", "fetchData: ${it.message}")
+                        _uiState.value = _uiState.value.copy(isApiError = true)
                         _uiState.value = _uiState.value.copy(error = "Character not found")
                     }
                     isLoading(false)
@@ -39,6 +40,7 @@ class DetailViewModel @Inject constructor(
             }
         } else {
             isLoading(false)
+            _uiState.value = _uiState.value.copy(isApiError = true)
             _uiState.value = _uiState.value.copy(error = "Character not found")
         }
     }
@@ -52,5 +54,6 @@ class DetailViewModel @Inject constructor(
 data class DetailUiState(
     val character: Character? = null,
     val isLoading: Boolean = false,
+    val isApiError: Boolean = false,
     val error: String? = null,
 )
