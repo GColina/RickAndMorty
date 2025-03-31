@@ -14,4 +14,11 @@ class CharacterRepositoryImpl @Inject constructor(private val characterDataSourc
     override suspend fun getCharacterById(id: Int): Flow<Result<CharacterDto>> = flow {
         emit(characterDataSource.getCharacterById(id))
     }
+    override suspend fun getNextPage(url: String): Flow<Result<CharacterResponse>> = flow {
+        emit(characterDataSource.getNextPage(url))
+    }
+
+    override suspend fun getCharacterByName(name: String): Flow<Result<CharacterResponse>> = flow {
+        emit(characterDataSource.getCharacterByName(name))
+    }
 }

@@ -10,3 +10,6 @@ object Home_Screen
 
 @Serializable
 object Detail_Screen
+
+@Serializable
+object Error_Screen

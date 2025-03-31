@@ -5,5 +5,6 @@ class Constants {
         const val BASE_URL = "https://rickandmortyapi.com/api/"
         const val CHARACTERS_ENDPOINT = "character"
         const val DETAILS_ENDPOINT = "character/{id}"
+        const val SEARCH_ENDPOINT = "character/"
     }
 }
