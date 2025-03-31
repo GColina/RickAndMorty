@@ -16,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val characterRepository: CharacterRepository, private val navManager: NavManager
+    private val characterRepository: CharacterRepository,
+    private val navManager: NavManager
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow(HomeUiState())
@@ -67,7 +68,6 @@ class HomeViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(
                             info = list.info.toDomain(),
                             charactersFiltered = list.results.map { result -> result.toDomain() })
-                        Log.d("LogGeneral", "onSearchByName: ${_uiState.value.charactersFiltered}")
                     }.onFailure {
                         Log.e("LogGeneral", "onSearchByName: ${it.message}")
                     }

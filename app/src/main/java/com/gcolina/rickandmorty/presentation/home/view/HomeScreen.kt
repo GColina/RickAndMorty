@@ -10,20 +10,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gcolina.rickandmorty.R
 import com.gcolina.rickandmorty.presentation.common.Loader
-import com.gcolina.rickandmorty.presentation.home.model.Character
+import com.gcolina.rickandmorty.presentation.home.view.viewComponents.HomeSearch
 import com.gcolina.rickandmorty.presentation.home.view.viewComponents.ItemCharacter
 import com.gcolina.rickandmorty.presentation.home.viewModel.HomeViewModel
 import com.gcolina.rickandmorty.utils.noRippleClickable
@@ -80,12 +70,11 @@ fun HomeScreen(
         isLoading = uiState.isLoading,
         isApiError = uiState.error != null,
         navigateToError = { navigateToError() }) {
-
         Column(
             modifier = Modifier
                 .background(colorResource(R.color.primary_color))
                 .fillMaxSize()
-                .padding(dimensionResource(R.dimen.big_padding))
+                .padding(dimensionResource(R.dimen.mid_padding))
                 .noRippleClickable {
                     isSearchActive = false
                     focusManager.clearFocus(true)
@@ -94,23 +83,23 @@ fun HomeScreen(
                 painter = painterResource(R.drawable.ic_logo_rickandmorty),
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(dimensionResource(R.dimen.mid_padding))
+                    .padding(dimensionResource(R.dimen.min_padding))
                     .height(50.dp)
                     .fillMaxWidth(),
                 alignment = Alignment.TopCenter
             )
 
-            HomeSearchBar(
+            HomeSearch(
                 query = uiState.etSearchByName ?: "",
                 onQueryChange = { homeViewModel.onTextChange(it) },
-                onSearch = {
-                    homeViewModel.onSearchByName()
-                    isSearchActive = false
-                },
+                onSearch = { homeViewModel.onSearchByName() },
                 active = isSearchActive,
-                characters = uiState.characters,
-                onActiveChange = { isSearchActive = it })
-
+                characters = uiState.charactersFiltered,
+                onActiveChange = { isSearchActive = it },
+                onCharacterSelected = { characterId ->
+                    homeViewModel.saveCharacterId(characterId)
+                    navigateToDetail()
+                })
 
             Text(
                 text = stringResource(R.string.title),
@@ -143,92 +132,6 @@ fun HomeScreen(
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeSearchBar(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    onSearch: () -> Unit,
-    active: Boolean,
-    onActiveChange: (Boolean) -> Unit,
-    characters: List<Character>
-) {
-    SearchBar(
-        query = query,
-        shape = RoundedCornerShape(corner = CornerSize(dimensionResource(R.dimen.min_padding))),
-        onQueryChange = { newQuery -> onQueryChange(newQuery) },
-        onSearch = { onSearch() },
-        active = active,
-        onActiveChange = onActiveChange,
-        placeholder = { Text(text = stringResource(R.string.search_by_name), color = Color.White) },
-        trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null,
-                tint = colorResource(R.color.tertiary_color),
-                modifier = Modifier.noRippleClickable {
-                    onSearch()
-                }
-            )
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = dimensionResource(R.dimen.mid_padding))
-            .heightIn(max = 300.dp),
-        colors = SearchBarDefaults.colors(
-            containerColor = colorResource(R.color.secondary_color),
-            dividerColor = Color.Transparent,
-            inputFieldColors = SearchBarDefaults.inputFieldColors(
-                cursorColor = colorResource(R.color.tertiary_color),
-                focusedLeadingIconColor = Color.White,
-                unfocusedLeadingIconColor = Color.White,
-                focusedTrailingIconColor = Color.White,
-                unfocusedTrailingIconColor = Color.White,
-                focusedPlaceholderColor = Color.White.copy(alpha = 0.6f),
-                unfocusedPlaceholderColor = Color.White.copy(alpha = 0.6f),
-                focusedTextColor = Color.White
-            )
-        )
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 200.dp)
-        ) {
-            item {
-                Text(
-                    "Search Results: ${characters.size}",
-                    modifier = Modifier.padding(dimensionResource(R.dimen.mid_padding)),
-                    color = colorResource(R.color.tertiary_color)
-                )
-                Spacer(
-                    Modifier
-                        .height(dimensionResource(R.dimen.height_div_filter))
-                        .fillMaxWidth()
-                        .background(colorResource(R.color.tertiary_color))
-                )
-            }
-
-            items(characters.size) { position ->
-
-                Text(
-                    text = characters.get(position).name,
-                    modifier = Modifier.padding(dimensionResource(R.dimen.mid_padding)),
-                    color = colorResource(R.color.tertiary_color)
-                )
-                Spacer(
-                    Modifier
-                        .height(dimensionResource(R.dimen.height_div_filter))
-                        .background(colorResource(R.color.tertiary_color))
-                        .width(dimensionResource(R.dimen.big_padding))
-                        .align(Alignment.End)
-                )
             }
         }
     }
